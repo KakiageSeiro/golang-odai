@@ -1,15 +1,11 @@
 package main
 
 import (
+	"my-golang-odai/handler"
 	"net/http"
-	"fmt"
 )
 
 func main() {
-  http.HandleFunc("/", indexHandler)
+  http.HandleFunc("/", handler.IndexHandler)
   http.ListenAndServe(":80", nil)
-}
-
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprint(w, "Hello Example")
 }

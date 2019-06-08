@@ -2,18 +2,16 @@ package db
 
 import (
 	"database/sql"
-	"time"
 	_ "github.com/go-sql-driver/mysql"
+	"time"
 )
 
 const dsn = "root@tcp(db)/twitter"
-
 
 // DB database interface
 type DB struct {
 	conn *sql.DB
 }
-
 
 //DB接続し、コネクションを取得
 func GetConnection() (*DB, error) {

@@ -7,13 +7,13 @@ import (
 
 //ツイートのデータ型
 type Post struct {
-	ID int
+	ID   int
 	Name string
 	Text string
 }
 
 //すべての投稿を取得
-func RetrieveLists(ctx context.Context) ([]Post, error){
+func RetrieveLists(ctx context.Context) ([]Post, error) {
 
 	//DB接続
 	db, e := db.GetConnection()
@@ -27,13 +27,12 @@ func RetrieveLists(ctx context.Context) ([]Post, error){
 		"select name, text from posts",
 	)
 
-
 	//リストにして返却
 	list := make([]Post, 0)
-	for rows.Next(){
+	for rows.Next() {
 		//１レコード取り出してリストに追加
 		var p Post
-		if err := rows.Scan(&p.ID, &p.Name, &p.Text); err != nil {
+		if err := rows.Scan(&p.Name, &p.Text); err != nil {
 			return nil, err
 		}
 		list = append(list, p)

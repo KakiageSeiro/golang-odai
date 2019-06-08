@@ -8,25 +8,22 @@ import (
 )
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "★★★IndexHandler１")
+	//fmt.Fprintln(w, "★★★IndexHandler１")
 
 	lists, err := model.RetrieveLists(r.Context())
-	fmt.Fprintln(w, "★★★取得したツイート数■" + strconv.Itoa(len(lists)))
+	fmt.Fprintln(w, "★★★取得したツイート数■"+strconv.Itoa(len(lists)))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	fmt.Fprintln(w, "★★★IndexHandler２")
+	//fmt.Fprintln(w, "★★★IndexHandler２")
 
 	//テスト用描画
 	for _, e := range lists {
 		//デバッグ用ログ
-		fmt.Fprintln(w, "★★★ツイートユーザー名■" + e.Name)
-		fmt.Fprintln(w, "★★★ツイート内容■" + e.Text)
-		fmt.Fprintln(w, "■■■■■■■■■■■■■■■■■■■■■■■")
+		fmt.Fprintln(w, "")
+		fmt.Fprintln(w, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+		fmt.Fprintln(w, "★★★ツイートユーザー名■"+e.Name)
+		fmt.Fprintln(w, "★★★ツイート内容■"+e.Text)
 	}
-
-
-
-
 }

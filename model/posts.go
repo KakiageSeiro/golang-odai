@@ -14,8 +14,7 @@ type Post struct {
 
 //すべての投稿を取得
 func RetrieveLists(ctx context.Context) ([]Post, error) {
-
-	//DB接続
+	//DBコネクション取得
 	db, e := db.GetConnection()
 	if e != nil {
 		return nil, e
@@ -39,4 +38,25 @@ func RetrieveLists(ctx context.Context) ([]Post, error) {
 	}
 
 	return list, nil
+}
+
+//ツイートする
+func Tweet(ctx context.Context, name string, text string) error {
+	//DBコネクション取得
+	db, e := db.GetConnection()
+	if e != nil {
+		return e
+	}
+
+	//投稿内容を保存
+	if _, e := db.Open().QueryContext(
+		ctx,
+		"insert into posts(name, text) value(?, ?)",
+		name,
+		text,
+	); e != nil {
+		//失敗した場合
+		return e
+	}
+	return nil
 }

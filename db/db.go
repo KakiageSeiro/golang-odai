@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+//接続先
 const dsn = "root@tcp(db)/twitter"
 
 // DB database interface
@@ -22,13 +23,18 @@ func GetConnection() (*DB, error) {
 	}
 	db := DB{conn: conn}
 
+	//コネクションの最大ライフタイム（タイムアウト時間）
 	conn.SetConnMaxLifetime(10 * time.Second)
+	//コネクションの最大コネクション数
 	conn.SetMaxOpenConns(10)
+	//コネクションの最大待機数
 	conn.SetMaxIdleConns(10)
 
+	//接続確認
 	if err := conn.Ping(); err != nil {
 		return nil, err
 	}
+
 	return &db, nil
 }
 

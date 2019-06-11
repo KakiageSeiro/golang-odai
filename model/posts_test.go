@@ -18,7 +18,9 @@ type post struct {
 func TestTweet(t *testing.T) {
 	//テストデータ作成
 
+
 	//ランダム文字列とか
+
 
 	//呼び出し
 

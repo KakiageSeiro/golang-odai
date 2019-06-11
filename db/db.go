@@ -7,6 +7,7 @@ import (
 )
 
 //接続先
+//Docker-composeでのmy-golang-odai_db_1のように、dbという文字列が存在していれば以下のようにtcp(db)でOK
 const dsn = "root@tcp(db)/twitter"
 
 // DB database interface

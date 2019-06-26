@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+<body>
+<a href="/form">ツイートする</a><br><br>
+{{range .List}}
+    <a href="/posts/{{ .ID }}">{{ .ID }}</a><br>
+    name■{{ .Name }}<br>
+    text■{{ .Text }}
+    <br>
+    <br>
+{{end}}
+</body>
+</html>

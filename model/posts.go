@@ -12,6 +12,12 @@ type Post struct {
 	Text string
 }
 
+//ログイン用
+type Login struct {
+	Username string
+	Password string
+}
+
 var NotFoundRecord = errors.New("Notfound")
 
 func FindByID(_ context.Context, id string) (*Post, error) {
@@ -29,6 +35,30 @@ func FindByID(_ context.Context, id string) (*Post, error) {
 	}
 
 	return post, nil
+}
+
+//ログインできる場合はtrue
+func IsLogin(_ context.Context, username string, password string) (bool, error) {
+	db, err := New()
+	if err != nil {
+		return false, err
+	}
+
+	login := &Login{}
+	if err := db.Open().Where("id = ?", username, password).First(&login).Error; err != nil {
+		if (gorm.IsRecordNotFoundError(err)) {
+			return false, NotFoundRecord
+		}
+		return false, err
+	}
+
+	//レコードが習得できなかった場合はログイン不可
+	if login.Username == "" or login.Username == nil {
+		return false, nil
+	}
+
+	//レコードをしゅとくできたらログイン可能とみなす
+	return true, err
 }
 
 func Select(_ context.Context) ([]Post, error) {

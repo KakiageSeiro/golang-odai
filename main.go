@@ -11,6 +11,10 @@ func main() {
 	r := chi.NewRouter()
 
 	r.Get("/", handler.IndexHandler)
+
+	r.Get("/loginform", handler.LoginFormHandler)
+	r.Post("/login", handler.LoginHandler)
+
 	r.Get("/posts/{id}", handler.PostDetailHandler)
 	r.Get("/form", handler.FormHandler)
 	r.Post("/create", handler.CreateHandler)

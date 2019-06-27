@@ -23,6 +23,32 @@ func IndexRender(w http.ResponseWriter,posts []model.Post) {
 	re.HTML(w, http.StatusOK, "index", data)
 }
 
+//ログインフォーム
+func LoginFormHandler(w http.ResponseWriter, r *http.Request) {
+	re := render.New(render.Options{
+		Charset: "UTF-8",
+		Extensions: []string{".html"},
+	})
+	re.HTML(w, http.StatusOK, "login", nil)
+}
+
+//ログイン実行
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	//パラメータ取得
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+
+	//ユーザーテーブルにユーザ名が存在する場合ログインできる
+	post, err := model.IsLogin(r.Context(), username, password)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+
+	//インデックス画面にリダイレクト
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	posts, err := model.Select(r.Context())

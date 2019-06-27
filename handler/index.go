@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
+
 	"golang-odai/model"
 	"github.com/go-chi/chi"
 	"github.com/unrolled/render"
@@ -24,6 +26,37 @@ func IndexRender(w http.ResponseWriter,posts []model.Post) {
 }
 
 //ログインフォーム
+func SignupFormHandler(w http.ResponseWriter, r *http.Request) {
+	re := render.New(render.Options{
+		Charset: "UTF-8",
+		Extensions: []string{".html"},
+	})
+	re.HTML(w, http.StatusOK, "signup", nil)
+}
+
+//ログイン実行
+// func LoginHandler(w http.ResponseWriter, r *http.Request) {
+// 	//パラメータ取得
+// 	username := r.FormValue("username")
+// 	password := r.FormValue("password")
+//
+// 	//ユーザーテーブルにユーザ名が存在する場合ログインできる
+// 	postResult, err := model.IsLogin(r.Context(), username, password)
+// 	if err != nil {
+// 		http.Error(w, err.Error(), http.StatusInternalServerError)
+// 	}
+//
+// 	if postResult {
+// 		fmt.Fprintln(w, "Login Success!")
+//
+// 		//インデックス画面にリダイレクト
+// 		http.Redirect(w, r, "/", http.StatusSeeOther)
+// 	} else {
+// 		fmt.Fprintln(w, "Login Failed.")
+// 	}
+// }
+
+//ログインフォーム
 func LoginFormHandler(w http.ResponseWriter, r *http.Request) {
 	re := render.New(render.Options{
 		Charset: "UTF-8",
@@ -39,14 +72,19 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	password := r.FormValue("password")
 
 	//ユーザーテーブルにユーザ名が存在する場合ログインできる
-	post, err := model.IsLogin(r.Context(), username, password)
+	postResult, err := model.IsLogin(r.Context(), username, password)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
+	if postResult {
+		fmt.Fprintln(w, "Login Success!")
 
-	//インデックス画面にリダイレクト
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+		//インデックス画面にリダイレクト
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	} else {
+		fmt.Fprintln(w, "Login Failed.")
+	}
 }
 
 
@@ -87,18 +125,34 @@ func FormHandler(w http.ResponseWriter, r *http.Request) {
 	re.HTML(w, http.StatusOK, "form", nil)
 }
 
-func CreateHandler(w http.ResponseWriter, r *http.Request) {
-	name := r.FormValue("name")
-	text := r.FormValue("text")
+func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
+	username := r.FormValue("username")
+	password := r.FormValue("password")
 
-	p := model.Post{
-		Name: name,
-		Text: text,
+	p := model.User{
+		Username: username,
+		Password: password,
 	}
 
-	if err := model.Insert(r.Context(), p); err != nil {
+	if err := model.InsertUser(r.Context(), p); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
+
+// func CreateHandler(w http.ResponseWriter, r *http.Request) {
+// 	name := r.FormValue("name")
+// 	text := r.FormValue("text")
+//
+// 	p := model.Post{
+// 		Name: name,
+// 		Text: text,
+// 	}
+//
+// 	if err := model.Insert(r.Context(), p); err != nil {
+// 		http.Error(w, err.Error(), http.StatusInternalServerError)
+// 	}
+//
+// 	http.Redirect(w, r, "/", http.StatusSeeOther)
+// }

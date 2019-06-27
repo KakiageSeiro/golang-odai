@@ -13,7 +13,7 @@ type Post struct {
 }
 
 //ログイン用
-type Login struct {
+type User struct {
 	Username string
 	Password string
 }
@@ -44,8 +44,10 @@ func IsLogin(_ context.Context, username string, password string) (bool, error) 
 		return false, err
 	}
 
-	login := &Login{}
-	if err := db.Open().Where("id = ?", username, password).First(&login).Error; err != nil {
+	// 初期値 nil
+	user := &User{}
+	// メモ：gormのメソッドチェーン使うといい
+	if err := db.Open().Where("username = ? AND password = ?", username, password).First(&user).Error; err != nil {
 		if (gorm.IsRecordNotFoundError(err)) {
 			return false, NotFoundRecord
 		}
@@ -53,7 +55,12 @@ func IsLogin(_ context.Context, username string, password string) (bool, error) 
 	}
 
 	//レコードが習得できなかった場合はログイン不可
-	if login.Username == "" or login.Username == nil {
+	// メモ：stringにnilは入らない。ポインタならOK
+	// if user.Username == "" {
+	// 	return false, nil
+	// }
+	// メモ：こっちがいい
+	if user == nil {
 		return false, nil
 	}
 
@@ -71,6 +78,16 @@ func Select(_ context.Context) ([]Post, error) {
 	db.Open().Find(&posts)
 
 	return posts, nil
+}
+
+func InsertUser(ctx context.Context, user User) error {
+	db, err := New()
+	if err != nil {
+		return err
+	}
+	db.Open().Create(&user)
+
+	return nil
 }
 
 func Insert(ctx context.Context, post Post) error {

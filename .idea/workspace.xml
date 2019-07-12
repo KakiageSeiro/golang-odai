@@ -3,9 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="e4f0c5e9-67f8-43da-b045-666628159dae" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/posts.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/posts.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handler/index.go" beforeDir="false" afterPath="$PROJECT_DIR$/handler/index.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -48,8 +46,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/handler/index.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="587">
-              <caret line="130" lean-forward="true" selection-start-line="130" selection-end-line="130" />
+            <state relative-caret-position="180">
+              <caret line="108" lean-forward="true" selection-start-line="108" selection-end-line="108" />
             </state>
           </provider>
         </entry>
@@ -57,8 +55,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/model/posts.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="362">
-              <caret line="67" column="25" selection-start-line="67" selection-start-column="25" selection-end-line="67" selection-end-column="25" />
+            <state relative-caret-position="351">
+              <caret line="86" column="29" selection-start-line="86" selection-start-column="29" selection-end-line="86" selection-end-column="29" />
             </state>
           </provider>
         </entry>
@@ -90,8 +88,8 @@
         <option value="$PROJECT_DIR$/templates/login.html" />
         <option value="$PROJECT_DIR$/templates/signup.html" />
         <option value="$PROJECT_DIR$/main.go" />
-        <option value="$PROJECT_DIR$/handler/index.go" />
         <option value="$PROJECT_DIR$/model/posts.go" />
+        <option value="$PROJECT_DIR$/handler/index.go" />
       </list>
     </option>
   </component>
@@ -141,7 +139,7 @@
             <path>
               <item name="golang-odai" type="b2602c69:ProjectViewProjectNode" />
               <item name="golang-odai" type="462c0819:PsiDirectoryNode" />
-              <item name="vendor" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -179,11 +177,20 @@
       </list>
     </option>
   </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
   <component name="ToolWindowManager">
     <frame x="960" y="23" width="960" height="1057" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17755991" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17755991" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -192,7 +199,7 @@
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info active="true" anchor="bottom" id="TODO" order="6" visible="true" weight="0.32953367" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="8" />
       <window_info anchor="bottom" id="Version Control" order="9" />
@@ -283,6 +290,30 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/go.mod">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="28" column="21" selection-start-line="28" selection-start-column="21" selection-end-line="28" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/go.sum">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/model/db.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="1" selection-start-line="5" selection-start-column="1" selection-end-line="5" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/login.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="374">
+          <caret line="22" column="7" selection-start-line="22" selection-start-column="7" selection-end-line="22" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/templates/index.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
@@ -300,41 +331,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/go.mod">
+    <entry file="file://$PROJECT_DIR$/vendor/golang.org/x/crypto/bcrypt/bcrypt.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="28" column="21" selection-start-line="28" selection-start-column="21" selection-end-line="28" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/go.sum">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/login.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="22" column="7" selection-start-line="22" selection-start-column="7" selection-end-line="22" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/model/db.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" column="1" selection-start-line="5" selection-start-column="1" selection-end-line="5" selection-end-column="1" />
+        <state relative-caret-position="550">
+          <caret line="117" column="21" selection-start-line="117" selection-start-column="21" selection-end-line="117" selection-end-column="21" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/model/posts.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="362">
-          <caret line="67" column="25" selection-start-line="67" selection-start-column="25" selection-end-line="67" selection-end-column="25" />
+        <state relative-caret-position="351">
+          <caret line="86" column="29" selection-start-line="86" selection-start-column="29" selection-end-line="86" selection-end-column="29" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/handler/index.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="587">
-          <caret line="130" lean-forward="true" selection-start-line="130" selection-end-line="130" />
+        <state relative-caret-position="180">
+          <caret line="108" lean-forward="true" selection-start-line="108" selection-end-line="108" />
         </state>
       </provider>
     </entry>

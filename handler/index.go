@@ -60,9 +60,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if postResult {
 		log.Printf("Login Success!")
 
-
-		//TODO:このへんでセッションへかくのうしておく
-
 		//インデックス画面にリダイレクト
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	} else {
@@ -108,6 +105,8 @@ func FormHandler(w http.ResponseWriter, r *http.Request) {
 	re.HTML(w, http.StatusOK, "form", nil)
 }
 
+// TODO: バリデーション追加する
+
 func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
@@ -127,12 +126,12 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//セッションIDを生成してIDをDBに保持
-	sID, _ := uuid.NewV4()
-	c := &http.Cookie{
-		Name:  "session",
-		Value: sID.String(),
-	}
-	http.SetCookie(w, c)
+	// sID, _ := uuid.NewV4()
+	// c := &http.Cookie{
+	// 	Name:  "session",
+	// 	Value: sID.String(),
+	// }
+	// http.SetCookie(w, c)
 	//TODO:ここにセッションテーブルにID入れる処理
 	//dbSessions[c.Value] = un
 

@@ -126,6 +126,16 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
+	//セッションIDを生成してIDをDBに保持
+	sID, _ := uuid.NewV4()
+	c := &http.Cookie{
+		Name:  "session",
+		Value: sID.String(),
+	}
+	http.SetCookie(w, c)
+	//TODO:ここにセッションテーブルにID入れる処理
+	//dbSessions[c.Value] = un
+
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 

@@ -5,6 +5,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
+	"log"
 )
 
 type Post struct {
@@ -47,13 +48,14 @@ func IsLogin(_ context.Context, username string, password string) (bool, error) 
 
 	// 初期値 nil
 	user := &User{}
-	// メモ：gormのメソッドチェーン使うといい
-	if err := db.Open().Where("username = ? AND password = ?", username, password).First(&user).Error; err != nil {
+	if err := db.Open().Where("username = ?", username).First(&user).Error; err != nil {
 		if (gorm.IsRecordNotFoundError(err)) {
 			return false, NotFoundRecord
 		}
 		return false, err
 	}
+
+	log.Printf(user.Password)
 
 	// メモ：ifのなかの変数定義はスコープがifのなかだけになるから、ほかと同じ変数名が使える
 	if err := passwordVerify(user.Password, password); err != nil {
@@ -63,11 +65,6 @@ func IsLogin(_ context.Context, username string, password string) (bool, error) 
 	println("認証しました")
 
 	//レコードが習得できなかった場合はログイン不可
-	// メモ：stringにnilは入らない。ポインタならOK
-	// if user.Username == "" {
-	// 	return false, nil
-	// }
-	// メモ：こっちがいい
 	if user == nil {
 		return false, nil
 	}

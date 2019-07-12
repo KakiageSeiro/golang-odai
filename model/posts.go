@@ -59,18 +59,20 @@ func IsLogin(_ context.Context, username string, password string) (bool, error) 
 
 	// メモ：ifのなかの変数定義はスコープがifのなかだけになるから、ほかと同じ変数名が使える
 	if err := passwordVerify(user.Password, password); err != nil {
-		panic(err)
+		return false, err
 	}
 
 	println("認証しました")
 
 	//レコードが習得できなかった場合はログイン不可
-	if user == nil {
-		return false, nil
-	}
-
-	//レコードをしゅとくできたらログイン可能とみなす
-	return true, err
+	return user != nil, nil
+	// ↑ リファクタリング後
+	// if user == nil {
+	// 	return false, nil
+	// }
+	//
+	// //レコードをしゅとくできたらログイン可能とみなす
+	// return true, err
 }
 
 // パスワードハッシュを作る

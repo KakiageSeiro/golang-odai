@@ -23,7 +23,7 @@ func main() {
 
 	r.Get("/posts/{id}", handler.PostDetailHandler)
 	r.Get("/form", handler.FormHandler)
-	// r.Post("/create", handler.CreateHandler)
+	r.Post("/create", handler.CreateHandler)
 
 	r.Post("/create_user", handler.CreateUserHandler)
 

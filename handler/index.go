@@ -1,13 +1,12 @@
 package handler
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 
-	"golang-odai/model"
 	"github.com/go-chi/chi"
 	"github.com/unrolled/render"
-
+	"golang-odai/model"
 )
 
 type Data struct{
@@ -78,12 +77,12 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if postResult {
-		fmt.Fprintln(w, "Login Success!")
+		log.Printf("Login Success!")
 
 		//インデックス画面にリダイレクト
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		// http.Redirect(w, r, "/", http.StatusSeeOther)
 	} else {
-		fmt.Fprintln(w, "Login Failed.")
+		log.Printf("Login Failed.")
 	}
 }
 
@@ -141,18 +140,18 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
-// func CreateHandler(w http.ResponseWriter, r *http.Request) {
-// 	name := r.FormValue("name")
-// 	text := r.FormValue("text")
-//
-// 	p := model.Post{
-// 		Name: name,
-// 		Text: text,
-// 	}
-//
-// 	if err := model.Insert(r.Context(), p); err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 	}
-//
-// 	http.Redirect(w, r, "/", http.StatusSeeOther)
-// }
+func CreateHandler(w http.ResponseWriter, r *http.Request) {
+	name := r.FormValue("name")
+	text := r.FormValue("text")
+
+	p := model.Post{
+		Name: name,
+		Text: text,
+	}
+
+	if err := model.Insert(r.Context(), p); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}

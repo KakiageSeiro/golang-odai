@@ -2,8 +2,9 @@ package model
 
 import (
 	"context"
-	"github.com/pkg/errors"
 	"github.com/jinzhu/gorm"
+	"github.com/pkg/errors"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Post struct {
@@ -35,6 +36,15 @@ func FindByID(_ context.Context, id string) (*Post, error) {
 	}
 
 	return post, nil
+}
+
+// パスワードハッシュを作る
+func PasswordHash(pw string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(hash), err
 }
 
 //ログインできる場合はtrue

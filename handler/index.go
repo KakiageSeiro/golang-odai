@@ -33,28 +33,6 @@ func SignupFormHandler(w http.ResponseWriter, r *http.Request) {
 	re.HTML(w, http.StatusOK, "signup", nil)
 }
 
-//ログイン実行
-// func LoginHandler(w http.ResponseWriter, r *http.Request) {
-// 	//パラメータ取得
-// 	username := r.FormValue("username")
-// 	password := r.FormValue("password")
-//
-// 	//ユーザーテーブルにユーザ名が存在する場合ログインできる
-// 	postResult, err := model.IsLogin(r.Context(), username, password)
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 	}
-//
-// 	if postResult {
-// 		fmt.Fprintln(w, "Login Success!")
-//
-// 		//インデックス画面にリダイレクト
-// 		http.Redirect(w, r, "/", http.StatusSeeOther)
-// 	} else {
-// 		fmt.Fprintln(w, "Login Failed.")
-// 	}
-// }
-
 //ログインフォーム
 func LoginFormHandler(w http.ResponseWriter, r *http.Request) {
 	re := render.New(render.Options{
@@ -70,6 +48,9 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
+	log.Printf(username)
+	log.Printf(password)
+
 	//ユーザーテーブルにユーザ名が存在する場合ログインできる
 	postResult, err := model.IsLogin(r.Context(), username, password)
 	if err != nil {
@@ -79,8 +60,11 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if postResult {
 		log.Printf("Login Success!")
 
+
+		//TODO:このへんでセッションへかくのうしておく
+
 		//インデックス画面にリダイレクト
-		// http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	} else {
 		log.Printf("Login Failed.")
 	}
@@ -128,9 +112,14 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
+	ps, err := model.PasswordHash(password)
+	if err != nil {
+		panic(err)
+	}
+
 	p := model.User{
 		Username: username,
-		Password: password,
+		Password: ps,
 	}
 
 	if err := model.InsertUser(r.Context(), p); err != nil {
@@ -155,3 +144,4 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
+

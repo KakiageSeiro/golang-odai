@@ -38,15 +38,6 @@ func FindByID(_ context.Context, id string) (*Post, error) {
 	return post, nil
 }
 
-// パスワードハッシュを作る
-func PasswordHash(pw string) (string, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
-	if err != nil {
-		return "", err
-	}
-	return string(hash), err
-}
-
 //ログインできる場合はtrue
 func IsLogin(_ context.Context, username string, password string) (bool, error) {
 	db, err := New()
@@ -64,6 +55,13 @@ func IsLogin(_ context.Context, username string, password string) (bool, error) 
 		return false, err
 	}
 
+	// メモ：ifのなかの変数定義はスコープがifのなかだけになるから、ほかと同じ変数名が使える
+	if err := passwordVerify(user.Password, password); err != nil {
+		panic(err)
+	}
+
+	println("認証しました")
+
 	//レコードが習得できなかった場合はログイン不可
 	// メモ：stringにnilは入らない。ポインタならOK
 	// if user.Username == "" {
@@ -76,6 +74,20 @@ func IsLogin(_ context.Context, username string, password string) (bool, error) 
 
 	//レコードをしゅとくできたらログイン可能とみなす
 	return true, err
+}
+
+// パスワードハッシュを作る
+func PasswordHash(pw string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(hash), err
+}
+
+// パスワードがハッシュにマッチするか
+func passwordVerify(hash, pw string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(pw))
 }
 
 func Select(_ context.Context) ([]Post, error) {

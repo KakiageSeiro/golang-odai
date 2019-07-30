@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/gorilla/sessions"
 	"io"
+	"net/http"
 	"strings"
 )
 
@@ -24,7 +25,7 @@ func init(){
 // セッション名
 var session_name string = "gsid"
 // Cookie型のstore情報
-var strore *sessions.CookieStore
+var store *sessions.CookieStore
 // セッションオブジェクト
 var session *sessions.Session
 
@@ -85,6 +86,9 @@ func GetData1()(*Data1, error){
 	return data1, nil
 }
 
-func SetData1(data1 *Data1)(){
+func SetData1(data1 *Data1, r *http.Request, w http.ResponseWriter){
+	session.Values["data1"] = data1
 
+	// 保存
+	sessions.Save(r, w)
 }

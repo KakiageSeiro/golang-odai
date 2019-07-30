@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"golang-odai/session"
 	"log"
 	"net/http"
 
@@ -60,7 +61,12 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if postResult {
 		log.Printf("Login Success!")
 
+		s := &session.Data1{
+			Count: 1,
+			Msg: "てきとう",
+		}
 		//セッションに保存
+		session.SetData1(s, r ,w)
 
 		//インデックス画面にリダイレクト
 		http.Redirect(w, r, "/", http.StatusSeeOther)

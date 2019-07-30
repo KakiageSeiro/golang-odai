@@ -62,11 +62,13 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Login Success!")
 
 		s := &session.Data1{
-			Count: 1,
-			Msg: "てきとう",
+			UserId: 1,
 		}
 		//セッションに保存
-		session.SetData1(s, r ,w)
+		err := session.SetData1(s, r ,w)
+		if err != nil {
+			panic(err)
+		}
 
 		//インデックス画面にリダイレクト
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -147,11 +149,23 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateHandler(w http.ResponseWriter, r *http.Request) {
-	name := r.FormValue("name")
+
+	//ログインしているかを確認する
+	data, err := session.GetData1(r)
+	if err != nil {
+		panic(err)
+	}
+	//ユーザーがテーブルに存在することを確認
+	user, err := model.FindByUserId(r.Context(), data.UserId)
+	if err != nil {
+		panic(err)
+	}
+
+	//name := r.FormValue("name")
 	text := r.FormValue("text")
 
 	p := model.Post{
-		Name: name,
+		Name: user.Username,
 		Text: text,
 	}
 

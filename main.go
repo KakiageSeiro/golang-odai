@@ -1,13 +1,14 @@
 package main
 
 import (
-	"net/http"
-	"golang-odai/handler"
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-chi/chi"
+	_ "github.com/go-sql-driver/mysql"
+	"golang-odai/handler"
+	"net/http"
 )
 
 func main() {
+
 	r := chi.NewRouter()
 
 	// メモ：handlerのパッケージ分離したほうが見通し良くなる
@@ -21,9 +22,11 @@ func main() {
 	r.Get("/login", handler.LoginFormHandler)
 	r.Post("/login", handler.LoginHandler)
 
+	//TODO:u.Use（ミドルウェア）を利用してログイン確認を共通処理とする
+
 	r.Get("/posts/{id}", handler.PostDetailHandler)
 	r.Get("/form", handler.FormHandler)
-	//r.Post("/create", handler.CreateHandler)
+	r.Post("/create", handler.CreateHandler)
 
 	r.Post("/create_user", handler.CreateUserHandler)
 

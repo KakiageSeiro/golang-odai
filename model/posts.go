@@ -120,3 +120,20 @@ func Insert(ctx context.Context, post Post) error {
 
 	return nil
 }
+
+func FindByUserId(_ context.Context, id int) (*User, error) {
+	db, err := New()
+	if err != nil {
+		return nil, err
+	}
+
+	user := &User{}
+	if err := db.Open().Where("id = ?", id).First(&user).Error; err != nil {
+		if (gorm.IsRecordNotFoundError(err)) {
+			return nil, NotFoundRecord
+		}
+		return nil, err
+	}
+
+	return user, nil
+}

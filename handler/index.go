@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"github.com/gorilla/sessions"
 	"log"
 	"net/http"
 
@@ -9,19 +8,6 @@ import (
 	"github.com/unrolled/render"
 	"golang-odai/model"
 )
-
-// セッション名
-var session_name string = "gsid"
-// Cookie型のstore情報
-var strore *sessions.CookieStore
-// セッションオブジェクト
-var session *sessions.Session
-
-// 構造体
-type Data1 struct {
-	Count    int
-	Msg      string
-}
 
 type Data struct{
 	Posts []model.Post
@@ -73,6 +59,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if postResult {
 		log.Printf("Login Success!")
+
+		//セッションに保存
 
 		//インデックス画面にリダイレクト
 		http.Redirect(w, r, "/", http.StatusSeeOther)

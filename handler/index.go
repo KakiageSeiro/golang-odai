@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/gorilla/sessions"
 	"log"
 	"net/http"
 
@@ -8,6 +9,19 @@ import (
 	"github.com/unrolled/render"
 	"golang-odai/model"
 )
+
+// セッション名
+var session_name string = "gsid"
+// Cookie型のstore情報
+var strore *sessions.CookieStore
+// セッションオブジェクト
+var session *sessions.Session
+
+// 構造体
+type Data1 struct {
+	Count    int
+	Msg      string
+}
 
 type Data struct{
 	Posts []model.Post

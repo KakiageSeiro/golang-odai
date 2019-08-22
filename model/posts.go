@@ -10,12 +10,21 @@ import (
 
 type Post struct {
 	ID uint32
-	Name string
+	UserID uint32
+	Text string
+}
+
+//コメント
+type Comment struct {
+	ID uint32
+	UserID uint32
+	PostID uint32
 	Text string
 }
 
 //ログイン用
 type User struct {
+	ID uint32
 	Username string
 	Password string
 }
@@ -39,40 +48,38 @@ func FindByID(_ context.Context, id string) (*Post, error) {
 	return post, nil
 }
 
-//ログインできる場合はtrue
-func IsLogin(_ context.Context, username string, password string) (bool, error) {
+//ログインできる場合はユーザーIDを返す
+func IsLogin(_ context.Context, username string, password string) (*User, error) {
 	db, err := New()
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
 	// 初期値 nil
 	user := &User{}
 	if err := db.Open().Where("username = ?", username).First(&user).Error; err != nil {
 		if (gorm.IsRecordNotFoundError(err)) {
-			return false, NotFoundRecord
+			return nil, NotFoundRecord
 		}
-		return false, err
+		return nil, err
 	}
 
 	log.Printf(user.Password)
 
 	// メモ：ifのなかの変数定義はスコープがifのなかだけになるから、ほかと同じ変数名が使える
 	if err := passwordVerify(user.Password, password); err != nil {
-		return false, err
+		return nil, err
 	}
 
 	println("認証しました")
 
 	//レコードが習得できなかった場合はログイン不可
-	return user != nil, nil
-	// ↑ リファクタリング後
-	// if user == nil {
-	// 	return false, nil
-	// }
-	//
-	// //レコードをしゅとくできたらログイン可能とみなす
-	// return true, err
+	if user == nil {
+		return nil, nil
+	}
+
+	//レコードをしゅとくできたらログイン可能とみなす
+	return user, err
 }
 
 // パスワードハッシュを作る
@@ -119,6 +126,33 @@ func Insert(ctx context.Context, post Post) error {
 	db.Open().Create(&post)
 
 	return nil
+}
+
+func InsertComment(ctx context.Context, comment Comment) error {
+	db, err := New()
+	if err != nil {
+		return err
+	}
+	db.Open().Create(&comment)
+
+	return nil
+}
+
+func CommentFindByID(_ context.Context, postId string) ([]Comment, error) {
+	db, err := New()
+	if err != nil {
+		return nil, err
+	}
+
+	var comment []Comment
+	if err := db.Open().Where("post_id = ?", postId).Find(&comment).Error; err != nil {
+		if (gorm.IsRecordNotFoundError(err)) {
+			return nil, NotFoundRecord
+		}
+		return nil, err
+	}
+
+	return comment, nil
 }
 
 func FindByUserId(_ context.Context, id int) (*User, error) {

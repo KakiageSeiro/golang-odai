@@ -3,9 +3,24 @@
 <a href="/form">投稿画面</a><br>
 
 <a href="/">TOP</a><br>
-<a href="/posts/{{ .ID }}">
-name: {{ .Name }}
-text: {{ .Text }}
+<a href="/posts/{{ .PostID }}">
+    userId: {{ .UserID }}
+    text: {{ .PostText }}
+
+    {{range .CommentText}}
+        text: {{ .Text }}
+        <br>
+    {{end}}
 </a>
+
+<br><br><br>
+
+コメントフォーム
+<form action="/comment" method="post">
+    <input type="hidden" name="postID" value={{ .PostID }}>
+    text: <input type="text" name="text"><br>
+    <button type="submit">送信</button>
+</form>
+
 </body>
 </html>

@@ -13,3 +13,11 @@ create table if not exists users
   username    varchar(256) not null,
   password    varchar(256) not null
 );
+
+create table if not exists comments
+(
+  id      int unsigned not null primary key auto_increment,
+  user_id    int not null,
+  post_id    int not null,
+  text    varchar(256) not null
+);

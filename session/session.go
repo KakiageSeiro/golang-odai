@@ -24,9 +24,8 @@ var store *sessions.CookieStore
 
 // 構造体
 type Data1 struct {
-	UserId int
+	UserID int
 }
-
 
 // セッション用の初期処理
 func sessionInit(){

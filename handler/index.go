@@ -4,6 +4,7 @@ import (
 	"golang-odai/session"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi"
 	"github.com/unrolled/render"
@@ -58,11 +59,11 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	if postResult {
+	if postResult != nil {
 		log.Printf("Login Success!")
 
 		s := &session.Data1{
-			UserId: 1,
+			UserID: int(postResult.ID),
 		}
 		//セッションに保存
 		err := session.SetData1(s, r ,w)
@@ -92,10 +93,18 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	IndexRender(w, posts)
 }
 
+//post詳細画面
 func PostDetailHandler(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
+	//投稿を取得
 	post, err := model.FindByID(r.Context(), id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	//投稿に紐づくコメントを取得
+	comment, err := model.CommentFindByID(r.Context(), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -104,7 +113,23 @@ func PostDetailHandler(w http.ResponseWriter, r *http.Request) {
 		Charset: "UTF-8",
 		Extensions: []string{".html"},
 	})
-	re.HTML(w, http.StatusOK, "detail", post)
+
+
+
+
+	deta := struct {
+		PostID uint32
+		UserID uint32
+		PostText string
+		CommentText []model.Comment
+	}{
+		PostID: post.ID,
+		UserID: post.UserID,
+		PostText: post.Text,
+		CommentText: comment,
+	}
+
+	re.HTML(w, http.StatusOK, "detail", deta)
 }
 
 func FormHandler(w http.ResponseWriter, r *http.Request) {
@@ -150,22 +175,27 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 func CreateHandler(w http.ResponseWriter, r *http.Request) {
 
+	log.Printf("CreateHandler")
+
 	//ログインしているかを確認する
 	data, err := session.GetData1(r)
 	if err != nil {
 		panic(err)
 	}
 	//ユーザーがテーブルに存在することを確認
-	user, err := model.FindByUserId(r.Context(), data.UserId)
+	log.Printf(string(data.UserID))
+
+	_, err = model.FindByUserId(r.Context(), data.UserID)
 	if err != nil {
 		panic(err)
 	}
 
-	//name := r.FormValue("name")
+	log.Printf("投稿時ログイン確認OK")
+
 	text := r.FormValue("text")
 
 	p := model.Post{
-		Name: user.Username,
+		UserID: uint32(data.UserID),
 		Text: text,
 	}
 
@@ -176,3 +206,39 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+//コメント投稿
+func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
+
+	log.Printf("CreateCommentHandler")
+
+	//ログインしているかを確認する
+	data, err := session.GetData1(r)
+	if err != nil {
+		panic(err)
+	}
+	//ユーザーがテーブルに存在することを確認
+	log.Printf(string(data.UserID))
+
+	_, err = model.FindByUserId(r.Context(), data.UserID)
+	if err != nil {
+		panic(err)
+	}
+
+	log.Printf("コメント投稿時ログイン確認OK")
+
+	text := r.FormValue("text")
+	strPostID := r.FormValue("postID")
+	postID, err := strconv.Atoi(strPostID)
+
+	c := model.Comment{
+		UserID: uint32(data.UserID),
+		PostID: uint32(postID),
+		Text: text,
+	}
+
+	if err := model.InsertComment(r.Context(), c); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}

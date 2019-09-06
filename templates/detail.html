@@ -7,11 +7,20 @@
     userId: {{ .UserID }}
     text: {{ .PostText }}
 
-    {{range .CommentText}}
-        text: {{ .Text }}
-        <br>
-    {{end}}
 </a>
+
+<br>
+<br>
+↓↓コメント一覧↓↓
+<br>
+<br>
+
+{{range .CommentText}}
+    text: {{ .Text }}
+    <br>
+{{end}}
+
+
 
 <br><br><br>
 

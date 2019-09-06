@@ -1,10 +1,13 @@
 package handler
 
 import (
+	"fmt"
 	"golang-odai/session"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
+	"strings"
 
 	"github.com/go-chi/chi"
 	"github.com/unrolled/render"
@@ -26,7 +29,7 @@ func IndexRender(w http.ResponseWriter,posts []model.Post) {
 	re.HTML(w, http.StatusOK, "index", data)
 }
 
-//ログインフォーム
+//サインアップフォーム
 func SignupFormHandler(w http.ResponseWriter, r *http.Request) {
 	re := render.New(render.Options{
 		Charset: "UTF-8",
@@ -143,32 +146,84 @@ func FormHandler(w http.ResponseWriter, r *http.Request) {
 // TODO: バリデーション追加する
 
 func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
-	username := r.FormValue("username")
-	password := r.FormValue("password")
+	//username := r.FormValue("username")
+	//password := r.FormValue("password")
 
-	ps, err := model.PasswordHash(password)
+
+	// クエリを組み立て
+	values := url.Values{} // url.Valuesオブジェクト生成
+	values.Add("key", "AIzaSyAS_a8LX-EhpVqD_7rQALPMjViGc_NPpI8")
+
+	// Request を生成
+	url := "https://identitytoolkit.googleapis.com/v1/accounts:signUp"
+	req, err := http.NewRequest("POST", url, strings.NewReader(values.Encode()))
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return
 	}
 
-	p := model.User{
-		Username: username,
-		Password: ps,
+	// Content-Typeを設定
+	req.Header.Add("Content-Type", "application/json")
+
+
+	//ボディつくる
+
+
+
+	// Doメソッドでリクエストを投げる
+	// http.Response型のポインタ（とerror）が返ってくる
+	client := &http.Client{
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 
-	if err := model.InsertUser(r.Context(), p); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	// 関数を抜ける際に必ずresponseをcloseするようにdeferでcloseを呼ぶ
+	defer resp.Body.Close()
 
-	//セッションIDを生成してIDをDBに保持
-	// sID, _ := uuid.NewV4()
-	// c := &http.Cookie{
-	// 	Name:  "session",
-	// 	Value: sID.String(),
-	// }
-	// http.SetCookie(w, c)
-	//TODO:ここにセッションテーブルにID入れる処理
-	//dbSessions[c.Value] = un
+	log.Printf(resp.Status)
+
+
+
+
+
+
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//ps, err := model.PasswordHash(password)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//
+	//p := model.User{
+	//	Username: username,
+	//	Password: ps,
+	//}
+	//
+	//if err := model.InsertUser(r.Context(), p); err != nil {
+	//	http.Error(w, err.Error(), http.StatusInternalServerError)
+	//}
+	//
+	////セッションIDを生成してIDをDBに保持
+	//// sID, _ := uuid.NewV4()
+	//// c := &http.Cookie{
+	//// 	Name:  "session",
+	//// 	Value: sID.String(),
+	//// }
+	//// http.SetCookie(w, c)
+	////TODO:ここにセッションテーブルにID入れる処理
+	////dbSessions[c.Value] = un
 
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }

@@ -1,18 +1,57 @@
 package handler
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
-	"golang-odai/session"
-	"log"
-	"net/http"
-	"net/url"
-	"strconv"
-	"strings"
-
 	"github.com/go-chi/chi"
 	"github.com/unrolled/render"
 	"golang-odai/model"
+	"golang-odai/session"
+	"io"
+	"log"
+	"net/http"
+	"strconv"
+	"strings"
+	"context"
 )
+
+var (
+	apiURI = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/%s?key=%s"
+	tokenURI = "https://securetoken.googleapis.com/v1/token?key=%s"
+)
+
+type (
+	// SignInResponse /verifyPasswordのレスポンス
+	SignInResponse struct {
+		Kind         string `json:"kind"`
+		IDToken      string `json:"idToken"`
+		Email        string `json:"email"`
+		DisplayName  string `json:"displayName"`
+		RefreshToken string `json:"refreshToken"`
+		ExpiresIn    int    `json:"expiresIn,string"`
+		LocalID      string `json:"localId"`
+		Registered   bool   `json:"registered"`
+	}
+
+	// SignupNewUserResponse /signupNewUserのレスポンス
+	SignupNewUserResponse struct {
+		Kind         string `json:"kind"`
+		IDToken      string `json:"idToken"`
+		Email        string `json:"email"`
+		RefreshToken string `json:"resreshToken"`
+		ExpiresIn    int    `json:"expiresIn,string"`
+		LocalID      string `json:"localId"`
+	}
+
+	// UserData signup/signin時にPOSTするdata
+	UserData struct {
+		Email             string `json:"email"`
+		Password          string `json:"password"`
+		ReturnSecureToken bool   `json:"returnSecureToken"`
+	}
+)
+
 
 type Data struct{
 	Posts []model.Post
@@ -145,88 +184,141 @@ func FormHandler(w http.ResponseWriter, r *http.Request) {
 
 // TODO: バリデーション追加する
 
-func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
-	//username := r.FormValue("username")
-	//password := r.FormValue("password")
+// func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
+// 	//username := r.FormValue("username")
+// 	//password := r.FormValue("password")
+//
+//
+// 	// クエリを組み立て
+// 	values := url.Values{} // url.Valuesオブジェクト生成
+// 	values.Add("key", "AIzaSyAS_a8LX-EhpVqD_7rQALPMjViGc_NPpI8")
+//
+// 	// Request を生成
+// 	url := "https://identitytoolkit.googleapis.com/v1/accounts:signUp"
+// 	req, err := http.NewRequest("POST", url, strings.NewReader(values.Encode()))
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return
+// 	}
+//
+// 	// Content-Typeを設定
+// 	req.Header.Add("Content-Type", "application/json")
+//
+//
+// 	//ボディつくる
+//
+//
+//
+// 	// Doメソッドでリクエストを投げる
+// 	// http.Response型のポインタ（とerror）が返ってくる
+// 	client := &http.Client{
+// 	}
+// 	resp, err := client.Do(req)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return
+// 	}
+//
+// 	// 関数を抜ける際に必ずresponseをcloseするようにdeferでcloseを呼ぶ
+// 	defer resp.Body.Close()
+//
+// 	log.Printf(resp.Status)
+//
+//
+//
+//
+//
+//
+// 	//
+// 	//
+// 	//
+// 	//
+// 	//
+// 	//
+// 	//
+// 	//
+// 	//
+// 	//
+// 	//
+// 	//ps, err := model.PasswordHash(password)
+// 	//if err != nil {
+// 	//	panic(err)
+// 	//}
+// 	//
+// 	//p := model.User{
+// 	//	Username: username,
+// 	//	Password: ps,
+// 	//}
+// 	//
+// 	//if err := model.InsertUser(r.Context(), p); err != nil {
+// 	//	http.Error(w, err.Error(), http.StatusInternalServerError)
+// 	//}
+// 	//
+// 	////セッションIDを生成してIDをDBに保持
+// 	//// sID, _ := uuid.NewV4()
+// 	//// c := &http.Cookie{
+// 	//// 	Name:  "session",
+// 	//// 	Value: sID.String(),
+// 	//// }
+// 	//// http.SetCookie(w, c)
+// 	////TODO:ここにセッションテーブルにID入れる処理
+// 	////dbSessions[c.Value] = un
+//
+// 	http.Redirect(w, r, "/login", http.StatusSeeOther)
+// }
 
-
-	// クエリを組み立て
-	values := url.Values{} // url.Valuesオブジェクト生成
-	values.Add("key", "AIzaSyAS_a8LX-EhpVqD_7rQALPMjViGc_NPpI8")
-
-	// Request を生成
-	url := "https://identitytoolkit.googleapis.com/v1/accounts:signUp"
-	req, err := http.NewRequest("POST", url, strings.NewReader(values.Encode()))
-	if err != nil {
-		fmt.Println(err)
-		return
+func CreateUserHandler(w http.ResponseWriter, r *http.Request)  {
+	data := UserData{
+		Email:             "test@example.com",
+		Password:          "password",
+		ReturnSecureToken: false,
 	}
 
-	// Content-Typeを設定
-	req.Header.Add("Content-Type", "application/json")
-
-
-	//ボディつくる
-
-
-
-	// Doメソッドでリクエストを投げる
-	// http.Response型のポインタ（とerror）が返ってくる
-	client := &http.Client{
+	var res struct{}
+	if err := post(context.Background(), "signupNewUser", data, "AIzaSyAS_a8LX-EhpVqD_7rQALPMjViGc_NPpI8", &res); err != nil {
+		panic(err)
 	}
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	// 関数を抜ける際に必ずresponseをcloseするようにdeferでcloseを呼ぶ
-	defer resp.Body.Close()
-
-	log.Printf(resp.Status)
-
-
-
-
-
-
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//ps, err := model.PasswordHash(password)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//
-	//p := model.User{
-	//	Username: username,
-	//	Password: ps,
-	//}
-	//
-	//if err := model.InsertUser(r.Context(), p); err != nil {
-	//	http.Error(w, err.Error(), http.StatusInternalServerError)
-	//}
-	//
-	////セッションIDを生成してIDをDBに保持
-	//// sID, _ := uuid.NewV4()
-	//// c := &http.Cookie{
-	//// 	Name:  "session",
-	//// 	Value: sID.String(),
-	//// }
-	//// http.SetCookie(w, c)
-	////TODO:ここにセッションテーブルにID入れる処理
-	////dbSessions[c.Value] = un
-
-	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
+func post(ctx context.Context, service string, data interface{}, apikey string, resp interface{}) error {
+	b, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	r, err := http.NewRequest(
+		http.MethodPost,
+		fmt.Sprintf(apiURI, service, apikey),
+		strings.NewReader(string(b)),
+	)
+	if err != nil {
+		return err
+	}
+
+	r.Header.Set("Content-Type", "application/json")
+
+
+	client := &http.Client{}
+	res, err := client.Do(r.WithContext(ctx))
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	// Read the response body
+	buf := new(bytes.Buffer)
+	if _, err := io.Copy(buf, res.Body); err != nil {
+		return err
+	}
+
+	return json.Unmarshal(buf.Bytes(), &resp)
+}
+
+
+
+
+
+
+
 
 func CreateHandler(w http.ResponseWriter, r *http.Request) {
 

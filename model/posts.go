@@ -10,6 +10,7 @@ import (
 
 type Post struct {
 	ID uint32
+<<<<<<< HEAD
 	UserID uint32
 	Text string
 }
@@ -19,12 +20,18 @@ type Comment struct {
 	ID uint32
 	UserID uint32
 	PostID uint32
+=======
+	Name string
+>>>>>>> 95a6fbd55e2ebbb8edba0eda21840f5764a6fe3a
 	Text string
 }
 
 //ログイン用
 type User struct {
+<<<<<<< HEAD
 	ID uint32
+=======
+>>>>>>> 95a6fbd55e2ebbb8edba0eda21840f5764a6fe3a
 	Username string
 	Password string
 }
@@ -48,38 +55,67 @@ func FindByID(_ context.Context, id string) (*Post, error) {
 	return post, nil
 }
 
+<<<<<<< HEAD
 //ログインできる場合はユーザーIDを返す
 func IsLogin(_ context.Context, username string, password string) (*User, error) {
 	db, err := New()
 	if err != nil {
 		return nil, err
+=======
+//ログインできる場合はtrue
+func IsLogin(_ context.Context, username string, password string) (bool, error) {
+	db, err := New()
+	if err != nil {
+		return false, err
+>>>>>>> 95a6fbd55e2ebbb8edba0eda21840f5764a6fe3a
 	}
 
 	// 初期値 nil
 	user := &User{}
 	if err := db.Open().Where("username = ?", username).First(&user).Error; err != nil {
 		if (gorm.IsRecordNotFoundError(err)) {
+<<<<<<< HEAD
 			return nil, NotFoundRecord
 		}
 		return nil, err
+=======
+			return false, NotFoundRecord
+		}
+		return false, err
+>>>>>>> 95a6fbd55e2ebbb8edba0eda21840f5764a6fe3a
 	}
 
 	log.Printf(user.Password)
 
 	// メモ：ifのなかの変数定義はスコープがifのなかだけになるから、ほかと同じ変数名が使える
 	if err := passwordVerify(user.Password, password); err != nil {
+<<<<<<< HEAD
 		return nil, err
+=======
+		return false, err
+>>>>>>> 95a6fbd55e2ebbb8edba0eda21840f5764a6fe3a
 	}
 
 	println("認証しました")
 
 	//レコードが習得できなかった場合はログイン不可
+<<<<<<< HEAD
 	if user == nil {
 		return nil, nil
 	}
 
 	//レコードをしゅとくできたらログイン可能とみなす
 	return user, err
+=======
+	return user != nil, nil
+	// ↑ リファクタリング後
+	// if user == nil {
+	// 	return false, nil
+	// }
+	//
+	// //レコードをしゅとくできたらログイン可能とみなす
+	// return true, err
+>>>>>>> 95a6fbd55e2ebbb8edba0eda21840f5764a6fe3a
 }
 
 // パスワードハッシュを作る
@@ -126,6 +162,7 @@ func Insert(ctx context.Context, post Post) error {
 	db.Open().Create(&post)
 
 	return nil
+<<<<<<< HEAD
 }
 
 func InsertComment(ctx context.Context, comment Comment) error {
@@ -170,4 +207,6 @@ func FindByUserId(_ context.Context, id int) (*User, error) {
 	}
 
 	return user, nil
+=======
+>>>>>>> 95a6fbd55e2ebbb8edba0eda21840f5764a6fe3a
 }

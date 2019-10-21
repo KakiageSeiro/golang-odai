@@ -14,8 +14,12 @@ require (
 	github.com/google/btree v1.0.0 // indirect
 	github.com/google/pprof v0.0.0-20190515194954-54271f7e092f // indirect
 	github.com/googleapis/gax-go/v2 v2.0.5 // indirect
+<<<<<<< HEAD
 	github.com/gorilla/mux v1.7.3 // indirect
 	github.com/gorilla/sessions v1.2.0
+=======
+	github.com/gorilla/mux v1.7.2 // indirect
+>>>>>>> 95a6fbd55e2ebbb8edba0eda21840f5764a6fe3a
 	github.com/jinzhu/gorm v1.9.9
 	github.com/kisielk/errcheck v1.2.0 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect

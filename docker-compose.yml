@@ -7,8 +7,8 @@ services:
     ports:
       - 18888:80
     volumes:
-      - .:/work
-    working_dir: /work
+      - .:/go/src/golang-odai
+    working_dir: /go/src/golang-odai
     depends_on:
       - db
 

@@ -1,0 +1,35 @@
+<html>
+<body>
+<a href="/form">投稿画面</a><br>
+
+<a href="/">TOP</a><br>
+<a href="/posts/{{ .PostID }}">
+    userId: {{ .UserID }}
+    text: {{ .PostText }}
+
+</a>
+
+<br>
+<br>
+↓↓コメント一覧↓↓
+<br>
+<br>
+
+{{range .CommentText}}
+    text: {{ .Text }}
+    <br>
+{{end}}
+
+
+
+<br><br><br>
+
+コメントフォーム
+<form action="/comment" method="post">
+    <input type="hidden" name="postID" value={{ .PostID }}>
+    text: <input type="text" name="text"><br>
+    <button type="submit">送信</button>
+</form>
+
+</body>
+</html>

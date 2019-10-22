@@ -1,6 +1,7 @@
 package handler
 
 import (
+<<<<<<< HEAD
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -53,6 +54,16 @@ type (
 )
 
 
+=======
+	"log"
+	"net/http"
+
+	"github.com/go-chi/chi"
+	"github.com/unrolled/render"
+	"golang-odai/model"
+)
+
+>>>>>>> 95a6fbd55e2ebbb8edba0eda21840f5764a6fe3a
 type Data struct{
 	Posts []model.Post
 }
@@ -68,7 +79,11 @@ func IndexRender(w http.ResponseWriter,posts []model.Post) {
 	re.HTML(w, http.StatusOK, "index", data)
 }
 
+<<<<<<< HEAD
 //サインアップフォーム
+=======
+//ログインフォーム
+>>>>>>> 95a6fbd55e2ebbb8edba0eda21840f5764a6fe3a
 func SignupFormHandler(w http.ResponseWriter, r *http.Request) {
 	re := render.New(render.Options{
 		Charset: "UTF-8",
@@ -101,6 +116,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
+<<<<<<< HEAD
 	if postResult != nil {
 		log.Printf("Login Success!")
 
@@ -113,6 +129,11 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 
+=======
+	if postResult {
+		log.Printf("Login Success!")
+
+>>>>>>> 95a6fbd55e2ebbb8edba0eda21840f5764a6fe3a
 		//インデックス画面にリダイレクト
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	} else {
@@ -135,26 +156,36 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	IndexRender(w, posts)
 }
 
+<<<<<<< HEAD
 //post詳細画面
 func PostDetailHandler(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
 	//投稿を取得
+=======
+func PostDetailHandler(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+>>>>>>> 95a6fbd55e2ebbb8edba0eda21840f5764a6fe3a
 	post, err := model.FindByID(r.Context(), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
+<<<<<<< HEAD
 	//投稿に紐づくコメントを取得
 	comment, err := model.CommentFindByID(r.Context(), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
+=======
+>>>>>>> 95a6fbd55e2ebbb8edba0eda21840f5764a6fe3a
 	re := render.New(render.Options{
 		Charset: "UTF-8",
 		Extensions: []string{".html"},
 	})
+<<<<<<< HEAD
 
 
 
@@ -172,6 +203,9 @@ func PostDetailHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	re.HTML(w, http.StatusOK, "detail", deta)
+=======
+	re.HTML(w, http.StatusOK, "detail", post)
+>>>>>>> 95a6fbd55e2ebbb8edba0eda21840f5764a6fe3a
 }
 
 func FormHandler(w http.ResponseWriter, r *http.Request) {
@@ -184,6 +218,7 @@ func FormHandler(w http.ResponseWriter, r *http.Request) {
 
 // TODO: バリデーション追加する
 
+<<<<<<< HEAD
 // func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 // 	//username := r.FormValue("username")
 // 	//password := r.FormValue("password")
@@ -343,6 +378,45 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	p := model.Post{
 		UserID: uint32(data.UserID),
+=======
+func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+
+	ps, err := model.PasswordHash(password)
+	if err != nil {
+		panic(err)
+	}
+
+	p := model.User{
+		Username: username,
+		Password: ps,
+	}
+
+	if err := model.InsertUser(r.Context(), p); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	//セッションIDを生成してIDをDBに保持
+	// sID, _ := uuid.NewV4()
+	// c := &http.Cookie{
+	// 	Name:  "session",
+	// 	Value: sID.String(),
+	// }
+	// http.SetCookie(w, c)
+	//TODO:ここにセッションテーブルにID入れる処理
+	//dbSessions[c.Value] = un
+
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
+}
+
+func CreateHandler(w http.ResponseWriter, r *http.Request) {
+	name := r.FormValue("name")
+	text := r.FormValue("text")
+
+	p := model.Post{
+		Name: name,
+>>>>>>> 95a6fbd55e2ebbb8edba0eda21840f5764a6fe3a
 		Text: text,
 	}
 
@@ -353,6 +427,7 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+<<<<<<< HEAD
 //コメント投稿
 func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -389,3 +464,5 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
+=======
+>>>>>>> 95a6fbd55e2ebbb8edba0eda21840f5764a6fe3a

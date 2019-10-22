@@ -1,0 +1,15 @@
+<html>
+<body>
+<a href="/posts/form">投稿画面</a><br>
+<a href="/signup">会員登録</a><br>
+<a href="/signin">サインイン</a><br>
+
+{{range .Posts}}
+  <a href="/posts/{{ .ID }}">
+  name: {{ .User.Name }}
+  text: {{ .Text }}
+  </a>
+  <br>
+{{end}}
+</body>
+</html>

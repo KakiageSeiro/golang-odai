@@ -11,7 +11,8 @@ create table if not exists users
 (
   id      int unsigned not null primary key auto_increment,
   username    varchar(256) not null,
-  password    varchar(256) not null
+  authentication_id  varchar(256) not null unique
+--   password    varchar(256) not null
 );
 
 create table if not exists comments

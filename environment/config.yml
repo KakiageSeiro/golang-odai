@@ -1,0 +1,16 @@
+domain: localhost
+
+session:
+  domain: localhost
+  secret: xxxxx
+
+render:
+  is_development: true
+
+jaeger:
+  agent_endpoint: trace:6831
+  collector_endpoint: http://trace:14268/api/traces
+  service_name: golang-odai
+
+firebase:
+  api_key:

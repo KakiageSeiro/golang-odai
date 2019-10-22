@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form action="/posts/create" method="post">
+    name: {{ .User.Name }}<br>
+    text: <input type="text" name="text"><br>
+    <button type="submit">送信</button>
+</form>
+
+</body>
+</html>

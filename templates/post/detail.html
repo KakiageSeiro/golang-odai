@@ -1,0 +1,11 @@
+<html>
+<body>
+<a href="/posts/form">投稿画面</a><br>
+
+<a href="/">TOP</a><br>
+<a href="/posts/{{ .Post.ID }}">
+name: {{ .Post.User.Name }}
+text: {{ .Post.Text }}
+</a>
+</body>
+</html>

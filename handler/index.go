@@ -182,109 +182,49 @@ func FormHandler(w http.ResponseWriter, r *http.Request) {
 	re.HTML(w, http.StatusOK, "form", nil)
 }
 
-// TODO: バリデーション追加する
 
-// func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
-// 	//username := r.FormValue("username")
-// 	//password := r.FormValue("password")
-//
-//
-// 	// クエリを組み立て
-// 	values := url.Values{} // url.Valuesオブジェクト生成
-// 	values.Add("key", "AIzaSyAS_a8LX-EhpVqD_7rQALPMjViGc_NPpI8")
-//
-// 	// Request を生成
-// 	url := "https://identitytoolkit.googleapis.com/v1/accounts:signUp"
-// 	req, err := http.NewRequest("POST", url, strings.NewReader(values.Encode()))
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		return
-// 	}
-//
-// 	// Content-Typeを設定
-// 	req.Header.Add("Content-Type", "application/json")
-//
-//
-// 	//ボディつくる
-//
-//
-//
-// 	// Doメソッドでリクエストを投げる
-// 	// http.Response型のポインタ（とerror）が返ってくる
-// 	client := &http.Client{
-// 	}
-// 	resp, err := client.Do(req)
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		return
-// 	}
-//
-// 	// 関数を抜ける際に必ずresponseをcloseするようにdeferでcloseを呼ぶ
-// 	defer resp.Body.Close()
-//
-// 	log.Printf(resp.Status)
-//
-//
-//
-//
-//
-//
-// 	//
-// 	//
-// 	//
-// 	//
-// 	//
-// 	//
-// 	//
-// 	//
-// 	//
-// 	//
-// 	//
-// 	//ps, err := model.PasswordHash(password)
-// 	//if err != nil {
-// 	//	panic(err)
-// 	//}
-// 	//
-// 	//p := model.User{
-// 	//	Username: username,
-// 	//	Password: ps,
-// 	//}
-// 	//
-// 	//if err := model.InsertUser(r.Context(), p); err != nil {
-// 	//	http.Error(w, err.Error(), http.StatusInternalServerError)
-// 	//}
-// 	//
-// 	////セッションIDを生成してIDをDBに保持
-// 	//// sID, _ := uuid.NewV4()
-// 	//// c := &http.Cookie{
-// 	//// 	Name:  "session",
-// 	//// 	Value: sID.String(),
-// 	//// }
-// 	//// http.SetCookie(w, c)
-// 	////TODO:ここにセッションテーブルにID入れる処理
-// 	////dbSessions[c.Value] = un
-//
-// 	http.Redirect(w, r, "/login", http.StatusSeeOther)
-// }
-
+//ユーザー新規作成
 func CreateUserHandler(w http.ResponseWriter, r *http.Request)  {
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+	println(username)
+	println(password)
+
 	data := UserData{
-		Email:             "test@example.com",
-		Password:          "password",
+		Email:             username,
+		Password:          password,
 		ReturnSecureToken: false,
 	}
 
+	//Firebaseにユーザー作成
 	var res struct{}
-	if err := post(context.Background(), "signupNewUser", data, "AIzaSyAS_a8LX-EhpVqD_7rQALPMjViGc_NPpI8", &res); err != nil {
+	//if err := post(context.Background(), "signupNewUser", data, "AIzaSyAS_a8LX-EhpVqD_7rQALPMjViGc_NPpI8", &res); err != nil {
+	//	panic(err)
+	//}
+
+	if err := post(context.Background(), "signupNewUser", data, "AIzaSyAPCjcraJVAGrZMnEpUzueXVhsTCsgMjZE", &res); err != nil {
 		panic(err)
 	}
+
+
+
+
+	//TODO:結果を確認しエラーだった場合はエラーページ行き
+
+
+	//インデックス画面にリダイレクト
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+
 }
+
+//Firebaseにユーザー作成
 func post(ctx context.Context, service string, data interface{}, apikey string, resp interface{}) error {
 	b, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
 
+	//Firebaseへのリクエスト作成
 	r, err := http.NewRequest(
 		http.MethodPost,
 		fmt.Sprintf(apiURI, service, apikey),
@@ -310,15 +250,12 @@ func post(ctx context.Context, service string, data interface{}, apikey string, 
 		return err
 	}
 
+	if res.StatusCode == http.StatusBadRequest {
+		panic(res)
+	}
+
 	return json.Unmarshal(buf.Bytes(), &resp)
 }
-
-
-
-
-
-
-
 
 func CreateHandler(w http.ResponseWriter, r *http.Request) {
 

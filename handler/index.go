@@ -95,73 +95,59 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf(username)
 	log.Printf(password)
 
-	//ユーザーテーブルにユーザ名が存在する場合ログインできる
-	postResult, err := model.IsLogin(r.Context(), username, password)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	if postResult != nil {
-		log.Printf("Login Success!")
-
-		s := &session.Data1{
-			UserID: int(postResult.ID),
-		}
-		//セッションに保存
-		err := session.SetData1(s, r ,w)
-		if err != nil {
-			panic(err)
-		}
-
-		//インデックス画面にリダイレクト
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-	} else {
+	//firebaseでユーザーとパスの検証をする
+	localID, err2 := LoginVerify(username, password)
+	if err2 != nil {
 		log.Printf("Login Failed.")
 	}
+
+	log.Printf("Login Success!")
+
+	s := &session.Data1{
+		UserID: int(localID),
+	}
+
+	//セッションに保存
+	err3 := session.SetData1(s, r ,w)
+	if err3 != nil {
+		panic(err3)
+	}
+
+	//インデックス画面にリダイレクト
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+
 }
 
 
-//★★★firebaseでログイン情報を検証
-//func LoginVerify(ctx context.Context, username, password String){
-//	println(username)
-//	println(password)
-//
-//	data := UserData{
-//		Email:             username,
-//		Password:          password,
-//		ReturnSecureToken: true,
-//	}
-//
-//	var res SignInResponse
-//	if err := post(context.Background(), "verifyPassword", data, "AIzaSyAPCjcraJVAGrZMnEpUzueXVhsTCsgMjZE", &res); err != nil {
-//		panic(err)
-//	}
-//
-//	//ログインできた場合はセッションに格納
-//	log.Printf("Login Success!")
-//
-//	var s = &session.Data1{
-//		UserID: res.LocalID,
-//	} //セッションに保存
-//	err := session.SetData1(s, r ,w)
-//	if err != nil {
-//		panic(err)
-//	}
-//
-//	//インデックス画面にリダイレクト
-//	http.Redirect(w, r, "/", http.StatusSeeOther)
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//}
+//firebaseでログイン情報を検証
+func LoginVerify(username, password string) (int, error){
+	println(username)
+	println(password)
+
+	data := UserData{
+		Email:             username,
+		Password:          password,
+		ReturnSecureToken: true,
+	}
+
+	var res SignInResponse
+	if err := post(context.Background(), "verifyPassword", data, "AIzaSyAPCjcraJVAGrZMnEpUzueXVhsTCsgMjZE", &res); err != nil {
+		panic(err)
+	}
+
+	//ログインできた場合はセッションに格納
+	log.Printf("Login Success!")
+
+	localID, err := strconv.Atoi(res.LocalID)
+	if err == nil {
+		return 0, err
+	}
+	return localID, nil
+
+
+}
+
+
 
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -226,7 +212,7 @@ func FormHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 
-//★★★ユーザー新規作成
+//ユーザー新規作成
 func CreateUserHandler(w http.ResponseWriter, r *http.Request)  {
 	username := r.FormValue("username")
 	password := r.FormValue("password")

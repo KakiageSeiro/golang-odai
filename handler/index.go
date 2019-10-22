@@ -121,6 +121,49 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 
+//★★★firebaseでログイン情報を検証
+//func LoginVerify(ctx context.Context, username, password String){
+//	println(username)
+//	println(password)
+//
+//	data := UserData{
+//		Email:             username,
+//		Password:          password,
+//		ReturnSecureToken: true,
+//	}
+//
+//	var res SignInResponse
+//	if err := post(context.Background(), "verifyPassword", data, "AIzaSyAPCjcraJVAGrZMnEpUzueXVhsTCsgMjZE", &res); err != nil {
+//		panic(err)
+//	}
+//
+//	//ログインできた場合はセッションに格納
+//	log.Printf("Login Success!")
+//
+//	var s = &session.Data1{
+//		UserID: res.LocalID,
+//	} //セッションに保存
+//	err := session.SetData1(s, r ,w)
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	//インデックス画面にリダイレクト
+//	http.Redirect(w, r, "/", http.StatusSeeOther)
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//}
+
+
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	posts, err := model.Select(r.Context())
 	if err != nil {
@@ -183,7 +226,7 @@ func FormHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 
-//ユーザー新規作成
+//★★★ユーザー新規作成
 func CreateUserHandler(w http.ResponseWriter, r *http.Request)  {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
@@ -205,8 +248,6 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request)  {
 	if err := post(context.Background(), "signupNewUser", data, "AIzaSyAPCjcraJVAGrZMnEpUzueXVhsTCsgMjZE", &res); err != nil {
 		panic(err)
 	}
-
-
 
 
 	//TODO:結果を確認しエラーだった場合はエラーページ行き

@@ -231,7 +231,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request)  {
 	//	panic(err)
 	//}
 
-	if err := post(context.Background(), "signupNewUser", data, "AIzaSyAPCjcraJVAGrZMnEpUzueXVhsTCsgMjZE", &res); err != nil {
+	if err := post(context.Background(), "signupNewUser", data, "AIzaSyAS_a8LX-EhpVqD_7rQALPMjViGc_NPpI8", &res); err != nil {
 		panic(err)
 	}
 

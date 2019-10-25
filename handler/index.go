@@ -103,8 +103,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Login Success!")
 
+	log.Println("■■■ｓ")
+	log.Println(localID)
 	s := &session.Data1{
-		UserID: int(localID),
+		SessionID: localID,
 	}
 
 	//セッションに保存
@@ -120,7 +122,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 
 //firebaseでログイン情報を検証
-func LoginVerify(username, password string) (int, error){
+func LoginVerify(username, password string) (string, error){
 	println(username)
 	println(password)
 
@@ -138,17 +140,9 @@ func LoginVerify(username, password string) (int, error){
 	//ログインできた場合はセッションに格納
 	log.Printf("Login Success!")
 
-	localID, err := strconv.Atoi(res.LocalID)
-	if err == nil {
-		return 0, err
-	}
-	return localID, nil
-
-
+	log.Printf("%+v¥n", res)
+	return res.LocalID, nil
 }
-
-
-
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	posts, err := model.Select(r.Context())
@@ -185,12 +179,9 @@ func PostDetailHandler(w http.ResponseWriter, r *http.Request) {
 		Extensions: []string{".html"},
 	})
 
-
-
-
 	deta := struct {
 		PostID uint32
-		UserID uint32
+		UserID string
 		PostText string
 		CommentText []model.Comment
 	}{
@@ -204,6 +195,15 @@ func PostDetailHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func FormHandler(w http.ResponseWriter, r *http.Request) {
+
+	//ログインしているかを確認する
+	data, err := session.GetData1(r)
+	log.Println(data.SessionID)
+	if err != nil {
+		panic(err)
+	}
+
+
 	re := render.New(render.Options{
 		Charset: "UTF-8",
 		Extensions: []string{".html"},
@@ -226,7 +226,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request)  {
 	}
 
 	//Firebaseにユーザー作成
-	var res struct{}
+	var res SignupNewUserResponse
 	//if err := post(context.Background(), "signupNewUser", data, "AIzaSyAS_a8LX-EhpVqD_7rQALPMjViGc_NPpI8", &res); err != nil {
 	//	panic(err)
 	//}
@@ -236,11 +236,23 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request)  {
 	}
 
 
+	//セッションIDとユーザーネームをDBに保存
+	//ログイン用
+	user := model.User {
+		SessionID: res.LocalID,
+		Username: username,
+	}
+	model.InsertUser(r.Context(), user)
+
+
+
+
+
 	//TODO:結果を確認しエラーだった場合はエラーページ行き
 
 
 	//インデックス画面にリダイレクト
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 
 }
 
@@ -284,19 +296,20 @@ func post(ctx context.Context, service string, data interface{}, apikey string, 
 	return json.Unmarshal(buf.Bytes(), &resp)
 }
 
+//投稿
 func CreateHandler(w http.ResponseWriter, r *http.Request) {
 
-	log.Printf("CreateHandler")
+	log.Printf("■■■■■■CreateHandler")
 
 	//ログインしているかを確認する
 	data, err := session.GetData1(r)
+	log.Println(data.SessionID)
 	if err != nil {
 		panic(err)
 	}
-	//ユーザーがテーブルに存在することを確認
-	log.Printf(string(data.UserID))
 
-	_, err = model.FindByUserId(r.Context(), data.UserID)
+
+	user, err := model.FindBySessionId(r.Context(), data.SessionID)
 	if err != nil {
 		panic(err)
 	}
@@ -306,7 +319,7 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 	text := r.FormValue("text")
 
 	p := model.Post{
-		UserID: uint32(data.UserID),
+		UserID: user.Username,
 		Text: text,
 	}
 
@@ -327,10 +340,8 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	//ユーザーがテーブルに存在することを確認
-	log.Printf(string(data.UserID))
 
-	_, err = model.FindByUserId(r.Context(), data.UserID)
+	user, err := model.FindBySessionId(r.Context(), data.SessionID)
 	if err != nil {
 		panic(err)
 	}
@@ -342,7 +353,7 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	postID, err := strconv.Atoi(strPostID)
 
 	c := model.Comment{
-		UserID: uint32(data.UserID),
+		UserID: user.Username,
 		PostID: uint32(postID),
 		Text: text,
 	}

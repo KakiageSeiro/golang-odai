@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-chi/chi"
+	"github.com/labstack/echo/v4"
 	"github.com/unrolled/render"
 	"golang-odai/model"
 	"golang-odai/session"
@@ -57,7 +58,7 @@ type Data struct{
 	Posts []model.Post
 }
 
-func IndexRender(w http.ResponseWriter,posts []model.Post) {
+func IndexRender(w http.ResponseWriter, posts []model.Post) {
 	re := render.New(render.Options{
 		Charset: "UTF-8",
 		Extensions: []string{".html"},
@@ -144,19 +145,30 @@ func LoginVerify(username, password string) (string, error){
 	return res.LocalID, nil
 }
 
-func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	posts, err := model.Select(r.Context())
-	if err != nil {
-		/*
-			if err == model.Notfound {
-				not found
-			}
-		*/
+// Echoサンプル
+// func IndexHandler(c echo.Context) error {
+// 	return c.String(http.StatusOK, "Hello, World!")
+// }
 
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+func IndexHandler(c echo.Context) error {
+	re := c.Request()
+	posts, err := model.Select(re.Context())
+	if err != nil {
+		return err
 	}
-	IndexRender(w, posts)
+	// return c.Render(http.StatusOK, "page1", posts)
+	return c.JSON(http.StatusOK, posts)
+
+	// return c.String(http.StatusOK, "Hello, World!")
 }
+
+// func IndexHandler(w http.ResponseWriter, r *http.Request) {
+// 	posts, err := model.Select(r.Context())
+// 	if err != nil {
+// 		http.Error(w, err.Error(), http.StatusInternalServerError)
+// 	}
+// 	IndexRender(w, posts)
+// }
 
 //post詳細画面
 func PostDetailHandler(w http.ResponseWriter, r *http.Request) {

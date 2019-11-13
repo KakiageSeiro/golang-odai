@@ -158,8 +158,7 @@ func IndexHandler(c echo.Context) error {
 	}
 	// return c.Render(http.StatusOK, "page1", posts)
 	return c.JSON(http.StatusOK, posts)
-
-	// return c.String(http.StatusOK, "Hello, World!")
+	// TODO: 次回↑をIndexRenderに変えたい
 }
 
 // func IndexHandler(w http.ResponseWriter, r *http.Request) {

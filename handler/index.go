@@ -9,6 +9,7 @@ import (
 	"github.com/unrolled/render"
 	"golang-odai/model"
 	"golang-odai/session"
+	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -56,17 +57,6 @@ type (
 
 type Data struct{
 	Posts []model.Post
-}
-
-func IndexRender(w http.ResponseWriter, posts []model.Post) {
-	re := render.New(render.Options{
-		Charset: "UTF-8",
-		Extensions: []string{".html"},
-	})
-	data := Data{
-		posts,
-	}
-	re.HTML(w, http.StatusOK, "index", data)
 }
 
 //サインアップフォーム
@@ -145,20 +135,51 @@ func LoginVerify(username, password string) (string, error){
 	return res.LocalID, nil
 }
 
-// Echoサンプル
-// func IndexHandler(c echo.Context) error {
-// 	return c.String(http.StatusOK, "Hello, World!")
-// }
-
-func IndexHandler(c echo.Context) error {
+//最初のページ（リンク一覧）
+func IndexHandler(c echo.Context) {
 	re := c.Request()
 	posts, err := model.Select(re.Context())
 	if err != nil {
-		return err
+		c.JSON(http.StatusOK, posts)
 	}
-	// return c.Render(http.StatusOK, "page1", posts)
-	return c.JSON(http.StatusOK, posts)
+	//return c.JSON(http.StatusOK, posts)
 	// TODO: 次回↑をIndexRenderに変えたい
+
+
+	IndexRender(c, posts)
+
+}
+
+//echoでのHTMLレンダリング用
+type Template struct {
+	templates *template.Template
+}
+
+func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	return t.templates.ExecuteTemplate(w, name, data)
+}
+
+//インデックスページ描画
+func IndexRender(c echo.Context, posts []model.Post) {
+
+	//HTMLファイル指定
+	t := &Template{
+		templates: template.Must(template.ParseGlob("views/index.html")),
+	}
+	c.Renderer = t
+	c.Render(http.StatusOK, "hello", "World")
+
+
+	//re := render.New(render.Options{
+	//	Charset: "UTF-8",
+	//	Extensions: []string{".html"},
+	//})
+	//
+	//data := Data{
+	//	posts,
+	//}
+
+	//re.HTML(w, http.StatusOK, "index", data)
 }
 
 // func IndexHandler(w http.ResponseWriter, r *http.Request) {

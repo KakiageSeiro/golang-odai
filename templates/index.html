@@ -2,13 +2,18 @@
 <body>
 <a href="/form">投稿画面</a><br>
 
-{{range .Posts}}
-  <a href="/posts/{{ .ID }}">
-  userId: {{ .UserID }}
-  text: {{ .Text }}
-  </a>
-  <br>
-{{end}}
+{{/*{{range .Posts}}*/}}
+{{/*  <a href="/posts/{{ .ID }}">*/}}
+{{/*  userId: {{ .UserID }}*/}}
+{{/*  text: {{ .Text }}*/}}
+{{/*  </a>*/}}
+{{/*  <br>*/}}
+{{/*{{end}}*/}}
+
+■■■
+{{define "hello"}}Hello, {{.}}!{{end}}
+★★★
+
 
 <ul>
   <li><a href="/">トップ</a></li>

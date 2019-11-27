@@ -4,20 +4,54 @@ import (
 	// "github.com/go-chi/chi"
 	_ "github.com/go-sql-driver/mysql"
 	"golang-odai/handler"
+	"html/template"
+	"io"
 	"net/http"
 	"github.com/labstack/echo/v4"
 )
 
-func main() {
 
-	// r := chi.NewRouter()
+
+
+
+//echoでのHTMLレンダリング用
+type Template struct {
+	templates *template.Template
+}
+
+func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	return t.templates.ExecuteTemplate(w, name, data)
+}
+
+func Hello(c echo.Context) error {
+	return c.Render(http.StatusOK, "hello", "World")
+}
+
+func main() {
 
 	e := echo.New()
 
-	// メモ：handlerのパッケージ分離したほうが見通し良くなる
-	// Goそのものよりレイヤーアーキテクチャ
-	// e.GET()
-	e.GET("/", handler.IndexHandler)
+	//HTMLファイル指定
+	t := &Template{
+		templates: template.Must(template.ParseGlob("templates/index.html")),
+	}
+
+	e.Renderer = t
+	e.GET("/", Hello)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	// e.GET("/signup", handler.SignupFormHandler)
 	//
@@ -36,5 +70,5 @@ func main() {
 	//
 	// e.POST("/create_user", handler.CreateUserHandler)
 
-	http.ListenAndServe(":80", e)
+	//http.ListenAndServe(":80", e)
 }

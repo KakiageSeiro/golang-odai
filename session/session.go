@@ -8,7 +8,7 @@ import (
 )
 
 //initという名称にするとパッケージが初めてインポートされたタイミングで実行される
-func init(){
+func init() {
 
 	// 構造体を登録
 	gob.Register(&Data1{})
@@ -19,6 +19,7 @@ func init(){
 
 // セッション名
 var session_name string = "gsid"
+
 // Cookie型のstore情報
 var store *sessions.CookieStore
 
@@ -28,7 +29,7 @@ type Data1 struct {
 }
 
 // セッション用の初期処理
-func sessionInit(){
+func sessionInit() {
 
 	//// 乱数生成
 	//b := make([]byte, 48)
@@ -44,11 +45,11 @@ func sessionInit(){
 
 	// セッションの有効範囲を指定
 	store.Options = &sessions.Options{
-		Domain:     "localhost",
-		Path:       "/",
-		MaxAge:     1000,
-		Secure:     false,
-		HttpOnly:   true,
+		Domain:   "localhost",
+		Path:     "/",
+		MaxAge:   1000,
+		Secure:   false,
+		HttpOnly: true,
 	}
 
 	//// log
@@ -64,9 +65,8 @@ func sessionInit(){
 
 }
 
-func GetData1(r *http.Request)(*Data1, error){
+func GetData1(r *http.Request) (*Data1, error) {
 	session, _ := store.Get(r, session_name)
-
 
 	data1, ok := session.Values["data1"].(*Data1)
 	if !ok {
@@ -79,7 +79,7 @@ func GetData1(r *http.Request)(*Data1, error){
 	return data1, nil
 }
 
-func SetData1(data1 *Data1, r *http.Request, w http.ResponseWriter) error{
+func SetData1(data1 *Data1, r *http.Request, w http.ResponseWriter) error {
 	session, _ := store.Get(r, session_name)
 
 	session.Values["data1"] = data1

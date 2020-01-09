@@ -1,8 +1,8 @@
 package model
 
 import (
-	"time"
 	"github.com/jinzhu/gorm"
+	"time"
 )
 
 const dsn = "root@tcp(db)/twitter"

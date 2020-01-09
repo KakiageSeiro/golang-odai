@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/go-chi/chi"
@@ -9,19 +10,19 @@ import (
 	"github.com/unrolled/render"
 	"golang-odai/model"
 	"golang-odai/session"
-	"html/template"
 	"io"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
-	"context"
 )
 
 var (
-	apiURI = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/%s?key=%s"
+	apiURI   = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/%s?key=%s"
 	tokenURI = "https://securetoken.googleapis.com/v1/token?key=%s"
 )
+
+const APIKEY = "AIzaSyBxDwSVBvI-j49sj9lOOkVEsuF00LsEx-Q"
 
 type (
 	// SignInResponse /verifyPasswordのレスポンス
@@ -54,34 +55,25 @@ type (
 	}
 )
 
-
-type Data struct{
+type Data struct {
 	Posts []model.Post
 }
 
 //サインアップフォーム
-func SignupFormHandler(w http.ResponseWriter, r *http.Request) {
-	re := render.New(render.Options{
-		Charset: "UTF-8",
-		Extensions: []string{".html"},
-	})
-	re.HTML(w, http.StatusOK, "signup", nil)
+func SignupFormHandler(c echo.Context) error {
+	return c.Render(http.StatusOK, "signup", nil)
 }
 
 //ログインフォーム
-func LoginFormHandler(w http.ResponseWriter, r *http.Request) {
-	re := render.New(render.Options{
-		Charset: "UTF-8",
-		Extensions: []string{".html"},
-	})
-	re.HTML(w, http.StatusOK, "login", nil)
+func LoginFormHandler(c echo.Context) error{
+	return c.Render(http.StatusOK, "login", nil)
 }
 
 //ログイン実行
-func LoginHandler(w http.ResponseWriter, r *http.Request) {
+func LoginHandler(c echo.Context) error {
 	//パラメータ取得
-	username := r.FormValue("username")
-	password := r.FormValue("password")
+	username := c.Param("username")
+	password := c.Param("password")
 
 	log.Printf(username)
 	log.Printf(password)
@@ -96,24 +88,23 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("■■■ｓ")
 	log.Println(localID)
-	s := &session.Data1{
-		SessionID: localID,
-	}
+	//s := &session.Data1{
+	//	SessionID: localID,
+	//}
 
-	//セッションに保存
-	err3 := session.SetData1(s, r ,w)
-	if err3 != nil {
-		panic(err3)
-	}
+	////セッションに保存
+	//err3 := session.SetData1(s, r, w)
+	//if err3 != nil {
+	//	panic(err3)
+	//}
 
 	//インデックス画面にリダイレクト
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-
+	//http.Redirect(w, r, "/", http.StatusSeeOther)
+	return c.Redirect(http.StatusMovedPermanently, "/")
 }
 
-
 //firebaseでログイン情報を検証
-func LoginVerify(username, password string) (string, error){
+func LoginVerify(username, password string) (string, error) {
 	println(username)
 	println(password)
 
@@ -124,7 +115,7 @@ func LoginVerify(username, password string) (string, error){
 	}
 
 	var res SignInResponse
-	if err := post(context.Background(), "verifyPassword", data, "AIzaSyAS_a8LX-EhpVqD_7rQALPMjViGc_NPpI8", &res); err != nil {
+	if err := post(context.Background(), "verifyPassword", data, APIKEY, &res); err != nil {
 		panic(err)
 	}
 
@@ -135,60 +126,60 @@ func LoginVerify(username, password string) (string, error){
 	return res.LocalID, nil
 }
 
-//最初のページ（リンク一覧）
-func IndexHandler(c echo.Context) {
-	re := c.Request()
-	posts, err := model.Select(re.Context())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+func IndexHandler(c echo.Context) error {
+	posts, err := model.Select()
 	if err != nil {
-		c.JSON(http.StatusOK, posts)
+		echo.NewHTTPError(http.StatusNotFound)
 	}
-	//return c.JSON(http.StatusOK, posts)
-	// TODO: 次回↑をIndexRenderに変えたい
+
+	log.Print(posts)
 
 
-	IndexRender(c, posts)
-
+	return c.Render(http.StatusOK, "index", posts)
 }
 
-//echoでのHTMLレンダリング用
-type Template struct {
-	templates *template.Template
-}
-
-func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	return t.templates.ExecuteTemplate(w, name, data)
-}
-
-//インデックスページ描画
-func IndexRender(c echo.Context, posts []model.Post) {
-
-	//HTMLファイル指定
-	t := &Template{
-		templates: template.Must(template.ParseGlob("views/index.html")),
-	}
-	c.Renderer = t
-	c.Render(http.StatusOK, "hello", "World")
 
 
-	//re := render.New(render.Options{
-	//	Charset: "UTF-8",
-	//	Extensions: []string{".html"},
-	//})
-	//
-	//data := Data{
-	//	posts,
-	//}
 
-	//re.HTML(w, http.StatusOK, "index", data)
-}
 
-// func IndexHandler(w http.ResponseWriter, r *http.Request) {
-// 	posts, err := model.Select(r.Context())
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 	}
-// 	IndexRender(w, posts)
-// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //post詳細画面
 func PostDetailHandler(w http.ResponseWriter, r *http.Request) {
@@ -207,19 +198,19 @@ func PostDetailHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	re := render.New(render.Options{
-		Charset: "UTF-8",
+		Charset:    "UTF-8",
 		Extensions: []string{".html"},
 	})
 
 	deta := struct {
-		PostID uint32
-		UserID string
-		PostText string
+		PostID      uint32
+		UserID      string
+		PostText    string
 		CommentText []model.Comment
 	}{
-		PostID: post.ID,
-		UserID: post.UserID,
-		PostText: post.Text,
+		PostID:      post.ID,
+		UserID:      post.UserID,
+		PostText:    post.Text,
 		CommentText: comment,
 	}
 
@@ -235,19 +226,19 @@ func FormHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-
 	re := render.New(render.Options{
-		Charset: "UTF-8",
+		Charset:    "UTF-8",
 		Extensions: []string{".html"},
 	})
 	re.HTML(w, http.StatusOK, "form", nil)
 }
 
-
 //ユーザー新規作成
-func CreateUserHandler(w http.ResponseWriter, r *http.Request)  {
-	username := r.FormValue("username")
-	password := r.FormValue("password")
+func CreateUserHandler(c echo.Context) error {
+
+	username := c.FormValue("username")
+	password := c.FormValue("password")
+
 	println(username)
 	println(password)
 
@@ -259,33 +250,21 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request)  {
 
 	//Firebaseにユーザー作成
 	var res SignupNewUserResponse
-	//if err := post(context.Background(), "signupNewUser", data, "AIzaSyAS_a8LX-EhpVqD_7rQALPMjViGc_NPpI8", &res); err != nil {
-	//	panic(err)
-	//}
-
-	if err := post(context.Background(), "signupNewUser", data, "AIzaSyAS_a8LX-EhpVqD_7rQALPMjViGc_NPpI8", &res); err != nil {
+	if err := post(c.Request().Context(), "signupNewUser", data, APIKEY, &res); err != nil {
 		panic(err)
 	}
 
-
 	//セッションIDとユーザーネームをDBに保存
 	//ログイン用
-	user := model.User {
+	user := model.User{
 		SessionID: res.LocalID,
-		Username: username,
+		Username:  username,
 	}
-	model.InsertUser(r.Context(), user)
-
-
-
-
-
-	//TODO:結果を確認しエラーだった場合はエラーページ行き
-
+	model.InsertUser(user)
 
 	//インデックス画面にリダイレクト
-	http.Redirect(w, r, "/login", http.StatusSeeOther)
-
+	//http.Redirect(w, r, "/login", http.StatusSeeOther)
+	return c.Redirect(http.StatusMovedPermanently, "/login")
 }
 
 //Firebaseにユーザー作成
@@ -296,7 +275,7 @@ func post(ctx context.Context, service string, data interface{}, apikey string, 
 	}
 
 	//Firebaseへのリクエスト作成
-	r, err := http.NewRequest(
+	request, err := http.NewRequest(
 		http.MethodPost,
 		fmt.Sprintf(apiURI, service, apikey),
 		strings.NewReader(string(b)),
@@ -305,11 +284,10 @@ func post(ctx context.Context, service string, data interface{}, apikey string, 
 		return err
 	}
 
-	r.Header.Set("Content-Type", "application/json")
-
+	request.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
-	res, err := client.Do(r.WithContext(ctx))
+	res, err := client.Do(request.WithContext(ctx))
 	if err != nil {
 		return err
 	}
@@ -321,9 +299,11 @@ func post(ctx context.Context, service string, data interface{}, apikey string, 
 		return err
 	}
 
+	println("ここかな")
 	if res.StatusCode == http.StatusBadRequest {
 		panic(res)
 	}
+	println("ここかも")
 
 	return json.Unmarshal(buf.Bytes(), &resp)
 }
@@ -340,7 +320,6 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-
 	user, err := model.FindBySessionId(r.Context(), data.SessionID)
 	if err != nil {
 		panic(err)
@@ -352,7 +331,7 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	p := model.Post{
 		UserID: user.Username,
-		Text: text,
+		Text:   text,
 	}
 
 	if err := model.Insert(r.Context(), p); err != nil {
@@ -387,7 +366,7 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	c := model.Comment{
 		UserID: user.Username,
 		PostID: uint32(postID),
-		Text: text,
+		Text:   text,
 	}
 
 	if err := model.InsertComment(r.Context(), c); err != nil {

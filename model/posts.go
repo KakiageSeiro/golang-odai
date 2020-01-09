@@ -8,24 +8,24 @@ import (
 )
 
 type Post struct {
-	ID uint32
+	ID     uint32
 	UserID string
-	Text string
+	Text   string
 }
 
 //コメント
 type Comment struct {
-	ID uint32
+	ID     uint32
 	UserID string
 	PostID uint32
-	Text string
+	Text   string
 }
 
 //ログイン用
 type User struct {
-	ID uint32
+	ID        uint32
 	SessionID string
-	Username string
+	Username  string
 }
 
 var NotFoundRecord = errors.New("Notfound")
@@ -38,7 +38,7 @@ func FindByID(_ context.Context, id string) (*Post, error) {
 
 	post := &Post{}
 	if err := db.Open().Where("id = ?", id).First(&post).Error; err != nil {
-		if (gorm.IsRecordNotFoundError(err)) {
+		if gorm.IsRecordNotFoundError(err) {
 			return nil, NotFoundRecord
 		}
 		return nil, err
@@ -93,7 +93,7 @@ func passwordVerify(hash, pw string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(pw))
 }
 
-func Select(_ context.Context) ([]Post, error) {
+func Select() ([]Post, error) {
 	db, err := New()
 	if err != nil {
 		return nil, err
@@ -105,7 +105,7 @@ func Select(_ context.Context) ([]Post, error) {
 	return posts, nil
 }
 
-func InsertUser(ctx context.Context, user User) error {
+func InsertUser(user User) error {
 	db, err := New()
 	if err != nil {
 		return err
@@ -143,7 +143,7 @@ func CommentFindByID(_ context.Context, postId string) ([]Comment, error) {
 
 	var comment []Comment
 	if err := db.Open().Where("post_id = ?", postId).Find(&comment).Error; err != nil {
-		if (gorm.IsRecordNotFoundError(err)) {
+		if gorm.IsRecordNotFoundError(err) {
 			return nil, NotFoundRecord
 		}
 		return nil, err
@@ -160,7 +160,7 @@ func FindByUserId(_ context.Context, id int) (*User, error) {
 
 	user := &User{}
 	if err := db.Open().Where("id = ?", id).First(&user).Error; err != nil {
-		if (gorm.IsRecordNotFoundError(err)) {
+		if gorm.IsRecordNotFoundError(err) {
 			return nil, NotFoundRecord
 		}
 		return nil, err
@@ -178,7 +178,7 @@ func FindBySessionId(_ context.Context, sessionID string) (*User, error) {
 
 	user := &User{}
 	if err := db.Open().Where("session_id = ?", sessionID).First(&user).Error; err != nil {
-		if (gorm.IsRecordNotFoundError(err)) {
+		if gorm.IsRecordNotFoundError(err) {
 			return nil, NotFoundRecord
 		}
 		return nil, err
